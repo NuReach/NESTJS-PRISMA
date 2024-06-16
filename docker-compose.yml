@@ -3,11 +3,26 @@ services:
   mysql: # Service name changed to reflect MySQL
     image: mysql:8.0 # Specify the desired MySQL version (check hub.docker.com for available versions)
     restart: always
+    container_name: mysql-nest-prisma
     environment:
       MYSQL_ROOT_PASSWORD: 0105 # Replace with a strong password
       MYSQL_DATABASE: nestjs-prisma # Replace with your desired database name
     ports:
-      - '5433:3306' # Default MySQL port mapping (host:container)
+      - '3307:3306' # Default MySQL port mapping (host:container)
+  app:
+    build:
+      context: .
+      dockerfile: DockerFile
+    container_name: nest-prisma
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mysql
+    environment:
+      PRISMA_DATABASE_URL: mysql://root:0105@mysql:3307/nestjs-prisma
+      TYPEORM_CONNECTION: prisma
+    volumes:
+      - ./src:/app/src
 
 volumes:
   mysql:
